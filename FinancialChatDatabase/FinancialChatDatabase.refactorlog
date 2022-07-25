@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="2bab1121-5917-4d2a-92be-3598b37e0adb" ChangeDateTime="07/22/2022 20:54:12">
+    <Property Name="ElementName" Value="[dbo].[Message].[Username]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TimeStamp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2dcc75c5-5261-4334-8627-e238973d0835" ChangeDateTime="07/22/2022 20:57:17">
+    <Property Name="ElementName" Value="[dbo].[Message].[TimeStamp]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Timestamp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9e891fb6-967e-4ccf-be10-3fce04f48fad" ChangeDateTime="07/22/2022 20:57:24">
+    <Property Name="ElementName" Value="[dbo].[Message].[Timestamp]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TimeStamp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f2a9c866-58ed-4c31-875c-9948bebebfe0" ChangeDateTime="07/22/2022 20:57:36">
+    <Property Name="ElementName" Value="[dbo].[Message].[TimeStamp]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Timestamp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4dacfc41-ae17-4977-9979-8f2020054244" ChangeDateTime="07/22/2022 21:13:19">
+    <Property Name="ElementName" Value="[dbo].[Message].[Chatroom]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ChatroomId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="52c423bf-6f0b-4536-8018-6a25d45b9126" ChangeDateTime="07/22/2022 21:29:42">
+    <Property Name="ElementName" Value="[dbo].[Message].[Message]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Message]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Text" />
+  </Operation>
+</Operations>

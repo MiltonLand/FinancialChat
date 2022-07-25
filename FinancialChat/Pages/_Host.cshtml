@@ -1,0 +1,14 @@
+﻿@page "/"
+@namespace FinancialChat.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "_Layout";
+}
+<script>
+    function scrollToEnd(id) {
+        var container = document.getElementById(id);
+        container.scrollTop = container.scrollHeight;
+    }
+</script>
+
+<component type="typeof(App)" render-mode="ServerPrerendered" />

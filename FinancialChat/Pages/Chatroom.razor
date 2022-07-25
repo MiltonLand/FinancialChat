@@ -1,0 +1,149 @@
+﻿@page "/Chatroom"
+@using FinancialChat.Data
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Identity
+@using BotService
+@implements IAsyncDisposable
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager NavManager
+@inject ChatroomMessagesManager chatroomMessagesManager
+@inject IJSRuntime JS
+@inject Bot _bot
+@attribute [Authorize]
+
+<div id="messagesBox" class="container overflow-auto" style="height: 500px">
+    <div class="container align-self-end">
+        @if (chatroomMessagesManager.Messages is not null)
+        {
+            @foreach (var message in chatroomMessagesManager.Messages)
+            {
+                var position = "justify-content-start";
+                var alertStyle = "alert-secondary";
+
+                if (message.Username == username)
+                {
+                    position = "justify-content-end";
+                    alertStyle = "alert-primary";
+                }
+
+                <div class="container d-flex @position">
+                    <div class="alert @alertStyle" role="alert">
+                        @message.TimeStamp <strong>@message.Username</strong>: @message.Text
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="container">
+    <form @onsubmit="Send">
+        <div class="container d-flex">
+            <input @ref="textInput" @bind="messageInput" type="text" class="form-control" autocomplete="off">
+            <button class="btn btn-primary" disabled="@(!IsConnected)">Send</button>
+        </div>
+    </form>
+</div>
+
+@code {
+    private HubConnection? hubConnection;
+    private string? messageInput;
+    ElementReference textInput;
+    private string? username;
+
+    protected override async Task OnInitializedAsync()
+    {
+        username = await GetUserId();
+
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(NavManager.ToAbsoluteUri("/ChatHub"))
+        .WithAutomaticReconnect()
+        .Build();
+
+        hubConnection.On<Message>("ReceiveMessage", (message) =>
+        {
+            chatroomMessagesManager.AddMessage(message);
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await textInput.FocusAsync();
+        await JS.InvokeVoidAsync("scrollToEnd", "messagesBox");
+    }
+
+    private async Task<string> GetUserId(){
+        var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+        var username = user.Identities.FirstOrDefault()?.Name;
+
+        if (username is null)
+        {
+            throw new Exception("Unidentified user");
+        }
+
+        return username;
+    }
+
+    private async Task Send()
+    {
+        if (string.IsNullOrEmpty(messageInput))
+        {
+            return;
+        }
+
+        Message message = new Message();
+
+        message.TimeStamp = DateTime.Now;
+        message.Username = username;
+        message.Text = messageInput;
+        
+        messageInput = string.Empty;
+
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendMessage", message);
+            
+            if (IsCommand(message.Text))
+            {
+                try
+                {
+                    await _bot.Send(message.Text);
+                }
+                catch (Exception e)
+                {
+                    Message exceptionMessage = new Message
+                    {
+                        TimeStamp = DateTime.Now,
+                        Username = "Bot",
+                        Text = e.Message
+                    };
+
+                    chatroomMessagesManager.AddMessage(exceptionMessage);
+                }
+            }
+            else
+            {
+                await chatroomMessagesManager.SaveMessage(message);
+            }
+        }
+    }
+
+    private bool IsCommand(string s)
+    {
+        return s.StartsWith("/stock=");
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
