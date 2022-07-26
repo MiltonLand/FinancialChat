@@ -13,9 +13,9 @@
 
 <div id="messagesBox" class="container overflow-auto" style="height: 500px">
     <div class="container align-self-end">
-        @if (chatroomMessagesManager.Messages is not null)
+        @if (messages is not null)
         {
-            @foreach (var message in chatroomMessagesManager.Messages)
+            @foreach (var message in messages)
             {
                 var position = "justify-content-start";
                 var alertStyle = "alert-secondary";
@@ -47,6 +47,7 @@
 
 @code {
     private HubConnection? hubConnection;
+    private List<Message> messages;
     private string? messageInput;
     ElementReference textInput;
     private string? username;
@@ -54,16 +55,18 @@
     protected override async Task OnInitializedAsync()
     {
         username = await GetUserId();
+        chatroomMessagesManager.GetMessages();
+        messages = chatroomMessagesManager.Messages.ToList();
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(NavManager.ToAbsoluteUri("/ChatHub"))
         .WithAutomaticReconnect()
         .Build();
 
-        hubConnection.On<Message>("ReceiveMessage", (message) =>
+        hubConnection.On<Message>("ReceiveMessage", async (message) =>
         {
-            chatroomMessagesManager.AddMessage(message);
-            InvokeAsync(StateHasChanged);
+            messages.Add(message);
+            await InvokeAsync(StateHasChanged);
         });
 
         await hubConnection.StartAsync();
@@ -100,13 +103,13 @@
         message.TimeStamp = DateTime.Now;
         message.Username = username;
         message.Text = messageInput;
-        
+
         messageInput = string.Empty;
 
         if (hubConnection is not null)
         {
             await hubConnection.SendAsync("SendMessage", message);
-            
+
             if (IsCommand(message.Text))
             {
                 try
@@ -121,8 +124,8 @@
                         Username = "Bot",
                         Text = e.Message
                     };
-
-                    chatroomMessagesManager.AddMessage(exceptionMessage);
+                    
+                    await hubConnection.SendAsync("SendMessage", exceptionMessage);
                 }
             }
             else
@@ -134,7 +137,7 @@
 
     private bool IsCommand(string s)
     {
-        return s.StartsWith("/stock=");
+        return s.ToLower().StartsWith("/stock=");
     }
 
     public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
