@@ -110,7 +110,18 @@
         {
             await hubConnection.SendAsync("SendMessage", message);
 
-            if (IsCommand(message.Text))
+            if (IsCommand(message.Text) && !IsStockCommand(message.Text))
+            {
+                Message invalidCommandMessage = new Message
+                {
+                    TimeStamp = DateTime.Now,
+                    Username = "Bot",
+                    Text = "Invalid command"
+                };
+
+                await hubConnection.SendAsync("SendMessage", invalidCommandMessage);
+            }
+            else if (IsStockCommand(message.Text))
             {
                 try
                 {
@@ -136,6 +147,11 @@
     }
 
     private bool IsCommand(string s)
+    {
+        return s.ToLower().StartsWith("/");
+    }
+
+    private bool IsStockCommand(string s)
     {
         return s.ToLower().StartsWith("/stock=");
     }
