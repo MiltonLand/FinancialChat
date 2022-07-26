@@ -13,9 +13,9 @@
 
 <div id="messagesBox" class="container overflow-auto" style="height: 500px">
     <div class="container align-self-end">
-        @if (messages is not null)
+        @if (chatroomMessagesManager.Messages is not null)
         {
-            @foreach (var message in messages)
+            @foreach (var message in chatroomMessagesManager.Messages)
             {
                 var position = "justify-content-start";
                 var alertStyle = "alert-secondary";
@@ -47,7 +47,6 @@
 
 @code {
     private HubConnection? hubConnection;
-    private Queue<Message> messages;
     private int maxMessages = 50;
     private string? messageInput;
     ElementReference textInput;
@@ -56,8 +55,6 @@
     protected override async Task OnInitializedAsync()
     {
         username = await GetUserId();
-        chatroomMessagesManager.GetMessages();
-        messages = chatroomMessagesManager.Messages;
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(NavManager.ToAbsoluteUri("/ChatHub"))
@@ -66,21 +63,11 @@
 
         hubConnection.On<Message>("ReceiveMessage", async (message) =>
         {
-            AddMessage(message);
+            chatroomMessagesManager.AddMessage(message);
             await InvokeAsync(StateHasChanged);
         });
 
         await hubConnection.StartAsync();
-    }
-
-    private void AddMessage(Message m)
-    {
-        messages.Enqueue(m);
-
-        if (messages.Count > maxMessages)
-        {
-            messages.Dequeue();
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

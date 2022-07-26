@@ -30,7 +30,7 @@ builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
 builder.Services.AddSingleton<IMessageData, MessageData>();
 builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
 builder.Services.AddSingleton(x => new Bot("amqp://guest:guest@localhost:5672", "financial-chat-queue"));
-builder.Services.AddSingleton<ChatroomMessagesManager>();
+builder.Services.AddScoped<ChatroomMessagesManager>();
 
 builder.Services.AddResponseCompression(options =>
 {
