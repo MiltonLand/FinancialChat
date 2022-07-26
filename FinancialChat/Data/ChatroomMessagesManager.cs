@@ -6,7 +6,7 @@ namespace FinancialChat.Data;
 public class ChatroomMessagesManager
 {
 	private readonly IMessageData _messages;
-	private const int MAX_MESSAGES = 50;
+	private const int maxMessages = 50;
 	public Queue<Message> Messages { get; private set; } = new Queue<Message>();
 
 	public ChatroomMessagesManager(IMessageData messageData)
@@ -18,7 +18,7 @@ public class ChatroomMessagesManager
 
 	public async void GetMessages()
 	{
-		List<MessageModel>? messages = (await _messages.GetMessages()).Reverse().Take(MAX_MESSAGES).Reverse().ToList();
+		List<MessageModel>? messages = (await _messages.GetMessages()).Reverse().Take(maxMessages).Reverse().ToList();
 		var messagesList = new Queue<Message>();
 
 		messages.ForEach(m => messagesList.Enqueue(new Message
@@ -35,7 +35,7 @@ public class ChatroomMessagesManager
 	{
 		Messages.Enqueue(m);
 		
-		if (Messages.Count > MAX_MESSAGES)
+		if (Messages.Count > maxMessages)
 		{
 			Messages.Dequeue();
 		}

@@ -47,7 +47,8 @@
 
 @code {
     private HubConnection? hubConnection;
-    private List<Message> messages;
+    private Queue<Message> messages;
+    private int maxMessages = 50;
     private string? messageInput;
     ElementReference textInput;
     private string? username;
@@ -56,7 +57,7 @@
     {
         username = await GetUserId();
         chatroomMessagesManager.GetMessages();
-        messages = chatroomMessagesManager.Messages.ToList();
+        messages = chatroomMessagesManager.Messages;
 
         hubConnection = new HubConnectionBuilder()
         .WithUrl(NavManager.ToAbsoluteUri("/ChatHub"))
@@ -65,11 +66,21 @@
 
         hubConnection.On<Message>("ReceiveMessage", async (message) =>
         {
-            messages.Add(message);
+            AddMessage(message);
             await InvokeAsync(StateHasChanged);
         });
 
         await hubConnection.StartAsync();
+    }
+
+    private void AddMessage(Message m)
+    {
+        messages.Enqueue(m);
+
+        if (messages.Count > maxMessages)
+        {
+            messages.Dequeue();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
