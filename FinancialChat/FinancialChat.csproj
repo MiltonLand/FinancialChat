@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-FinancialChat-92DE7705-B511-423F-8F63-8FDA3C912772</UserSecretsId>
   </PropertyGroup>
@@ -17,7 +17,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
   </ItemGroup>
-
   <ItemGroup>
     <EditorConfigFiles Remove="C:\Users\Setzer\Documents\Repositories\FinancialChat\FinancialChat\.editorconfig" />
   </ItemGroup>

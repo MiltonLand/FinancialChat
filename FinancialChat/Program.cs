@@ -15,7 +15,8 @@ using RabbitMQ.Client.Events;
 using BotService;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var rabbitMQUrl = builder.Configuration.GetSection("RabbitMQSettings").GetValue(typeof(string), "Url").ToString();
+var rabbitMQQueue = builder.Configuration.GetSection("RabbitMQSettings").GetValue(typeof(string), "Queue").ToString();
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -28,8 +29,9 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
 builder.Services.AddSingleton<IMessageData, MessageData>();
-builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
-builder.Services.AddSingleton(x => new Bot("amqp://guest:guest@localhost:5672", "financial-chat-queue"));
+builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>(serviceProvider =>
+	new RabbitMQService(serviceProvider, rabbitMQUrl, rabbitMQQueue));
+builder.Services.AddSingleton(x => new Bot(rabbitMQUrl, rabbitMQQueue));
 builder.Services.AddScoped<ChatroomMessagesManager>();
 
 builder.Services.AddResponseCompression(options =>
